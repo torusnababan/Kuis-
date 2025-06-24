@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Kuis IPA SMP Energi Dalam Sistem Kehidupan</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    .hidden {
+      display: none;
+    }
+    input[type="text"] {
+      width: 300px;
+      margin-bottom: 10px;
+      display: block;
+    }
+    #timer {
+      font-weight: bold;
+      color: red;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Kuis IPA SMP</h2>
+  <h2>By: Torus Manuntun Nababan, M.Pd</h2>
+  <h2>Materi: Energi Dalam Sistem Kehidupan</h2>
+  <!-- Form Identitas -->
+  <div id="identityForm">
+    <h3>Silakan isi identitas terlebih dahulu:</h3>
+    <label>Nama:
+      <input type="text" id="nama" required>
+    </label>
+    <label>Kelas:
+      <input type="text" id="kelas" required>
+    </label>
+    <label>Tahun Ajaran:
+      <input type="text" id="tahun" required>
+    </label>
+    <label>Nama Sekolah:
+      <input type="text" id="sekolah" required>
+    </label>
+    <button onclick="startQuiz()">Mulai Kuis</button>
+  </div>
+
+  <!-- Timer -->
+  <div id="timer" class="hidden"></div>
+
+  <!-- Form Soal -->
+  <form id="quizForm" class="hidden">
+    <div id="questionsContainer"></div>
+    <button type="button" onclick="submitQuiz()">Selesai dan Lihat Skor</button>
+  </form>
+
+  <div id="result" class="hidden"></div>
+
+  <script>
+    const questions = [
+      { question: "1. Sumber utama energi bagi kehidupan di bumi adalah...", options: ["Matahari", "Batu bara", "Air", "Angin"], answer: "Matahari" },
+    { question: "2. Tumbuhan hijau menghasilkan makanan melalui proses...", options: ["Fermentasi", "Fotosintesis", "Respirasi", "Transpirasi"], answer: "Fotosintesis" },
+    { question: "3. Dalam proses fotosintesis, tumbuhan memerlukan...", options: ["Karbon monoksida dan air", "Oksigen dan air", "Karbon dioksida dan air", "Hidrogen dan air"], answer: "Karbon dioksida dan air" },
+    { question: "4. Energi kimia pada makanan digunakan oleh manusia untuk...", options: ["Berpikir dan bermain", "Bergerak dan tumbuh", "Bernapas dan tidur", "Meniru dan bersembunyi"], answer: "Bergerak dan tumbuh" },
+    { question: "5. Hewan memperoleh energi dengan cara...", options: ["Membuat makanannya sendiri", "Memakan makhluk hidup lain", "Melakukan fotosintesis", "Menyerap cahaya matahari"], answer: "Memakan makhluk hidup lain" },
+    { question: "6. Rantai makanan dimulai dari...", options: ["Konsumen", "Pengurai", "Produsen", "Hewan"], answer: "Produsen" },
+    { question: "7. Organisme yang tidak dapat membuat makanannya sendiri disebut...", options: ["Autotrof", "Heterotrof", "Produsen", "Tumbuhan"], answer: "Heterotrof" },
+    { question: "8. Contoh hewan herbivora adalah...", options: ["Kucing", "Singa", "Kerbau", "Elang"], answer: "Kerbau" },
+    { question: "9. Perpindahan energi dari satu makhluk hidup ke makhluk hidup lain disebut...", options: ["Daur ulang", "Siklus energi", "Rantai makanan", "Piramida energi"], answer: "Rantai makanan" },
+    { question: "10. Pada rantai makanan, manusia biasanya berperan sebagai...", options: ["Produsen", "Konsumen tingkat pertama", "Konsumen tingkat akhir", "Pengurai"], answer: "Konsumen tingkat akhir" },
+    { question: "11. Energi dalam makanan diubah menjadi energi gerak melalui proses...", options: ["Respirasi sel", "Fotosintesis", "Fermentasi", "Ekskresi"], answer: "Respirasi sel" },
+    { question: "12. Contoh energi alternatif yang ramah lingkungan adalah...", options: ["Minyak bumi", "Batu bara", "Energi surya", "Gas alam"], answer: "Energi surya" },
+    { question: "13. Bakteri pengurai berperan penting dalam ekosistem karena...", options: ["Membentuk energi", "Menghasilkan makanan", "Mengurai sisa makhluk hidup", "Memakan produsen"], answer: "Mengurai sisa makhluk hidup" },
+    { question: "14. Tumbuhan memerlukan cahaya matahari untuk menghasilkan...", options: ["Oksigen dan air", "Karbon dioksida dan glukosa", "Oksigen dan glukosa", "Karbon dioksida dan oksigen"], answer: "Oksigen dan glukosa" },
+    { question: "15. Energi dari makanan digunakan tubuh untuk...", options: ["Tidur dan diam", "Berjalan dan tumbuh", "Melihat dan mendengar", "Berpikir dan tidur"], answer: "Berjalan dan tumbuh" },
+    { question: "16. Urutan rantai makanan yang benar adalah...", options: ["Konsumen → Produsen → Pengurai", "Produsen → Konsumen → Pengurai", "Pengurai → Konsumen → Produsen", "Konsumen → Pengurai → Produsen"], answer: "Produsen → Konsumen → Pengurai" },
+    { question: "17. Contoh organisme pengurai adalah...", options: ["Rumput", "Jamur", "Sapi", "Elang"], answer: "Jamur" },
+    { question: "18. Makhluk hidup membutuhkan energi untuk...", options: ["Menjadi lebih berat", "Berpindah tempat dan tumbuh", "Tidur sepanjang hari", "Tidak melakukan aktivitas"], answer: "Berpindah tempat dan tumbuh" },
+    { question: "19. Sumber energi yang tidak terbatas dan ramah lingkungan adalah...", options: ["Minyak bumi", "Gas alam", "Matahari", "Batu bara"], answer: "Matahari" },
+    { question: "20. Energi panas matahari dimanfaatkan tumbuhan untuk...", options: ["Bergerak", "Mencari makan", "Membuat makanan", "Berbunga"], answer: "Membuat makanan" }
+  ];
+
+    let quizTimer;
+    let countdownInterval;
+    const timeLimit = 3 * 60 * 1000; // 3 menit
+
+    function startQuiz() {
+      const nama = document.getElementById('nama').value;
+      const kelas = document.getElementById('kelas').value;
+      const tahun = document.getElementById('tahun').value;
+      const sekolah = document.getElementById('sekolah').value;
+
+      if (!nama || !kelas || !tahun || !sekolah) {
+        alert("Harap lengkapi semua data identitas.");
+        return;
+      }
+
+      document.getElementById('identityForm').classList.add('hidden');
+      document.getElementById('quizForm').classList.remove('hidden');
+      document.getElementById('timer').classList.remove('hidden');
+
+      const container = document.getElementById('questionsContainer');
+      container.innerHTML = "";
+      questions.forEach((q, index) => {
+        const div = document.createElement('div');
+        div.classList.add('question');
+        div.innerHTML = `<p>${q.question}</p>` + q.options.map(opt => `
+          <label><input type="radio" name="q${index}" value="${opt}"> ${opt}</label><br>`).join('');
+        container.appendChild(div);
+      });
+
+      // Timer otomatis submit setelah 3 menit
+      quizTimer = setTimeout(() => {
+        alert("Waktu habis! Kuis akan otomatis disubmit.");
+        submitQuiz();
+      }, timeLimit);
+
+      // Countdown display
+      let remaining = timeLimit / 1000;
+      const timerDisplay = document.getElementById('timer');
+      timerDisplay.textContent = `Sisa waktu: ${remaining} detik`;
+      countdownInterval = setInterval(() => {
+        remaining--;
+        timerDisplay.textContent = `Sisa waktu: ${remaining} detik`;
+        if (remaining <= 0) {
+          clearInterval(countdownInterval);
+        }
+      }, 1000);
+    }
+
+    function submitQuiz() {
+      clearTimeout(quizTimer);
+      clearInterval(countdownInterval);
+
+      let score = 0;
+      questions.forEach((q, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        if (selected && selected.value === q.answer) {
+          score += 10;
+        }
+      });
+
+      document.getElementById('quizForm').classList.add('hidden');
+      document.getElementById('timer').classList.add('hidden');
+      const resultDiv = document.getElementById('result');
+      resultDiv.classList.remove('hidden');
+
+      const nama = document.getElementById('nama').value;
+      const kelas = document.getElementById('kelas').value;
+      const tahun = document.getElementById('tahun').value;
+      const sekolah = document.getElementById('sekolah').value;
+
+      let message = "";
+      if (score >= 70) {
+        message = "<p style='color: green;'><strong>Selamat!</strong> Anda Sudah Bisa Melanjutkan ke Materi Berikutnya.</p>";
+      } else {
+        message = "<p style='color: red;'><strong>Mohon maaf.</strong> Silakan pelajari kembali materi ini sebelum melanjutkan ke materi berikutnya.</p>";
+      }
+
+      resultDiv.innerHTML = `
+        <h3>Hasil Kuis</h3>
+        <p><strong>Nama:</strong> ${nama}</p>
+        <p><strong>Kelas:</strong> ${kelas}</p>
+        <p><strong>Tahun Ajaran:</strong> ${tahun}</p>
+        <p><strong>Sekolah:</strong> ${sekolah}</p>
+        <p><strong>Skor Anda:</strong> ${score} dari 100</p>
+        ${message}
+      `;
+    }
+  </script>
+</body>
+</html>
